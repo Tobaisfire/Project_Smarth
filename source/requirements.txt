@@ -1,7 +1,0 @@
-langchain
-langchain-core
-langchain-community
-langchain_openai
-pandas
-requests
-streamlit
