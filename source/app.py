@@ -1,10 +1,18 @@
 import streamlit as st
 from Smarth_da import CSVChat
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
+
+# Get the directory where this script is located
+SCRIPT_DIR = Path(__file__).parent.resolve()
+# Get the project root (one level up from source/)
+PROJECT_ROOT = SCRIPT_DIR.parent.resolve()
+# Build dataset paths relative to project root
+DATASET_DIR = PROJECT_ROOT / "dataset"
 
 # Page config
 st.set_page_config(
@@ -79,9 +87,10 @@ st.markdown("""
 # Initialize session state
 if 'chat' not in st.session_state:
     with st.spinner("🔄 Loading datasets... This may take a moment."):
+        # Build absolute paths to CSV files
         csv_files = {
-            'agriculture': '../dataset/Districtwise_Statewise crop area and production (All India, 1997 – present).csv',
-            'climate': '../dataset/imd_rainfall_clean.csv'
+            'agriculture': str(DATASET_DIR / 'Districtwise_Statewise crop area and production (All India, 1997 – present).csv'),
+            'climate': str(DATASET_DIR / 'imd_rainfall_clean.csv')
         }
         st.session_state.chat = CSVChat(csv_files, OPEN_AI_API_KEY)
         st.session_state.messages = []
