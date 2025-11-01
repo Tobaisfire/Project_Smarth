@@ -1,7 +1,6 @@
 import pandas as pd
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
-from langchain.chains import LLMChain
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -73,18 +72,21 @@ class CSVChat:
             template=template
         )
 
-        # Create chain
-        chain = LLMChain(llm=self.llm, prompt=prompt)
+        # Create chain using modern langchain API
+        chain = prompt | self.llm
 
         # Get response
-        response = chain.run(
-            data_context=data_context,
-            dataframes=', '.join(self.data.keys()),
-            question=question
-        )
+        response = chain.invoke({
+            "data_context": data_context,
+            "dataframes": ', '.join(self.data.keys()),
+            "question": question
+        })
+        
+        # Extract content from response (it's an AIMessage object)
+        response_text = response.content if hasattr(response, 'content') else str(response)
 
         # Extract code
-        code = self._extract_code(response)
+        code = self._extract_code(response_text)
 
         # Execute and get answer
         result = self._execute_code(code)
@@ -92,7 +94,7 @@ class CSVChat:
         return {
             'answer': result,
             'code': code,
-            'raw_response': response,
+            'raw_response': response_text,
             'data_context': data_context
         }
 

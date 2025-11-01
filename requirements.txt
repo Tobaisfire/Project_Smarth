@@ -5,3 +5,4 @@ langchain_openai
 pandas
 requests
 streamlit
+python-dotenv
